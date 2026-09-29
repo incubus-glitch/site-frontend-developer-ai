@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Статичные сайты: визитки и приглашения на свадьбы, дни рождения и другие праздники. По шаблону или с индивидуальным дизайном.">
+  <meta name="theme-color" content="#080808">
+  <title>Nikita — сайты-визитки и сайты-приглашения</title>
+  <meta property="og:title" content="Nikita — статичные сайты">
+  <meta property="og:description" content="Визитки и приглашения на свадьбы, дни рождения и праздники. Без лишнего.">
+  <meta property="og:type" content="website">
+  <link rel="preload" href="fonts/inter-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/favicon.svg">
+</head>
+
+<body>
+  <div class="page-noise" aria-hidden="true"></div>
+  <div class="cursor-dot" aria-hidden="true"></div>
+  <div class="cursor-ring" aria-hidden="true"></div>
+
+  <!-- Знак логотипа (используется в шапке и подвале) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="logo-mark" viewBox="0 0 120 120" fill="none">
+      <circle cx="60" cy="60" r="56" stroke="currentColor" stroke-width="4"/>
+      <path d="M34 32h13v56H34z" fill="currentColor"/>
+      <path d="M34 32h13l39 56H73z" fill="currentColor"/>
+      <path d="M75 34h9v52h-9z" stroke="currentColor" stroke-width="4"/>
+      <circle cx="99.6" cy="20.4" r="7" fill="currentColor"/>
+    </symbol>
+  </svg>
+
+  <header class="header">
+    <a class="brand" href="#top" aria-label="Nikita — наверх">
+      <svg class="brand-mark" aria-hidden="true"><use href="#logo-mark"/></svg>
+      <span>Nikita</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Основная навигация">
+      <a href="#about">Формат</a>
+      <a href="#directions">Услуги</a>
+      <a href="#works">Работы</a>
+      <a href="#method">Бриф</a>
+      <a href="#process">Этапы</a>
+      <a href="#contact">Контакты</a>
+      <a href="offer/" target="_blank">Оферта</a>
+    </nav>
+
+    <a class="header-cta" href="#contact">Обсудить проект <span>↗</span></a>
+
+    <button class="menu-button" type="button" aria-label="Открыть меню" aria-expanded="false">
+      <span></span><span></span>
+    </button>
+  </header>
+
+  <div class="mobile-menu" aria-hidden="true">
+    <nav>
+      <a href="#about">Формат</a>
+      <a href="#directions">Услуги</a>
+      <a href="#works">Работы</a>
+      <a href="#method">Бриф</a>
+      <a href="#process">Этапы</a>
+      <a href="#contact">Контакты</a>
+      <a href="offer/">Оферта</a>
+    </nav>
+    <p>Визитки · приглашения · статика</p>
+  </div>
+
+  <main id="top">
+    <!-- 01 HERO -->
+    <section class="hero section">
+      <div class="hero-top reveal">
+        <span class="eyebrow"><i></i> Визитки · приглашения · статика</span>
+        <span class="hero-index">01 / 09</span>
+      </div>
+
+      <div class="hero-content">
+        <div class="hero-copy">
+          <p class="hero-kicker reveal">Простой сайт — это тоже инструмент</p>
+
+          <h1 class="hero-title">
+            <span class="line reveal reveal-delay-1">Статичный</span>
+            <span class="line outline reveal reveal-delay-2">сайт.</span>
+            <span class="line reveal reveal-delay-3">Без лишнего.</span>
+          </h1>
+
+          <div class="hero-bottom reveal reveal-delay-4">
+            <p>
+              Делаю сайты-визитки и сайты-приглашения
+              на свадьбы, дни рождения и другие праздники —
+              по готовому шаблону или с дизайном под вас.
+            </p>
+            <a class="hero-cta magnetic" href="#contact">
+              <span class="circle-link" aria-hidden="true"><span>↓</span></span>
+              <span class="hero-cta__text">
+                <span class="hero-cta__label">Есть идея?</span>
+                <span class="hero-cta__title">Напишите — обсудим</span>
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-side reveal reveal-delay-3">
+          <div class="vertical-note">STATIC SITES / INVITATIONS / CARE</div>
+        </div>
+      </div>
+
+      <div class="hero-scroll">
+        <span>SCROLL TO EXPLORE</span>
+        <div class="scroll-line"><span></span></div>
+      </div>
+    </section>
+
+    <!-- 02 POSITIONING -->
+    <section class="manifesto section dark-section">
+      <div class="section-head reveal">
+        <span class="section-number">02</span>
+        <span class="section-label">Позиционирование</span>
+      </div>
+
+      <div class="manifesto-grid">
+        <h2 class="huge-text reveal">
+          Сайт — это<br>
+          <em>первое впечатление,</em><br>
+          которое работает без вас.
+        </h2>
+
+        <div class="manifesto-copy reveal reveal-delay-2">
+          <p class="lead">
+            Визитка, которой не стыдно поделиться. Приглашение, которое гости
+            откроют в мессенджере и сразу поймут: когда, где, в чём прийти —
+            и ответят в пару касаний.
+          </p>
+          <p>
+            Я делаю статичные сайты: они быстро открываются, не требуют
+            обслуживания и одинаково хорошо выглядят на телефоне и компьютере.
+            Без сложной разработки и без лишних обещаний.
+          </p>
+          <a class="text-link" href="#works">Посмотреть работы <span>↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 FORMAT -->
+    <section class="about section" id="about">
+      <div class="section-head reveal">
+        <span class="section-number">03</span>
+        <span class="section-label">Формат</span>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-lead reveal">
+          <p class="small-label">Честно о формате</p>
+          <h2>Только<br><span>статичные сайты.</span></h2>
+        </div>
+
+        <div class="about-content reveal reveal-delay-2">
+          <p class="about-text">
+            Статичный сайт — это готовые страницы без сервера и базы данных.
+            Он быстро открывается, его почти невозможно «сломать»,
+            и его не нужно обслуживать: выложили — и он работает.
+          </p>
+          <p class="about-text">
+            Для визиток и приглашений этого хватает с запасом:
+            рассказать о себе или о событии, показать детали
+            и дать удобный способ связаться или ответить.
+          </p>
+
+          <div class="scope">
+            <div class="scope-col">
+              <h3>Делаю</h3>
+              <ul>
+                <li>Сайты-визитки</li>
+                <li>Приглашения на свадьбы, дни рождения и праздники</li>
+                <li>Адаптив под телефон, планшет и компьютер</li>
+                <li>Публикацию на GitHub Pages или Netlify</li>
+              </ul>
+            </div>
+            <div class="scope-col is-no">
+              <h3>Не делаю</h3>
+              <ul>
+                <li>Базы данных и серверную часть</li>
+                <li>Личные кабинеты и регистрацию</li>
+                <li>Оплату на сайте и интернет-магазины</li>
+                <li>Админки и сложную логику</li>
+              </ul>
+            </div>
+          </div>
+
+          <p class="scope-note">
+            Анкета гостей в приглашениях — через Google Таблицу,
+            без своего сервера и баз данных.
+          </p>
+
+          <div class="facts">
+            <div class="fact">
+              <span class="fact-number">01</span>
+              <span>Визитки<br>· приглашения</span>
+            </div>
+            <div class="fact">
+              <span class="fact-number">02</span>
+              <span>Только<br>статика</span>
+            </div>
+            <div class="fact">
+              <span class="fact-number">03</span>
+              <span>Шаблон<br>или свой дизайн</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 SERVICES -->
+    <section class="directions section dark-section" id="directions">
+      <div class="section-head reveal">
+        <span class="section-number">04</span>
+        <span class="section-label">Что получаете</span>
+      </div>
+
+      <div class="directions-intro reveal">
+        <h2>Три формата.<br><em>Одна цель.</em></h2>
+        <p>Понятный сайт, который открывается с телефона за секунду и которым не стыдно поделиться.</p>
+      </div>
+
+      <div class="service-list">
+        <article class="service reveal">
+          <div class="service-top">
+            <span class="service-number">01</span>
+            <span class="service-tag">ВИЗИТКА</span>
+          </div>
+          <h3>Сайт-визитка</h3>
+          <p>
+            Кто вы, чем занимаетесь и как с вами связаться.
+            Для специалистов, мастеров и небольших проектов,
+            которым нужна аккуратная страница без лишнего.
+          </p>
+        </article>
+
+        <article class="service reveal reveal-delay-1">
+          <div class="service-top">
+            <span class="service-number">02</span>
+            <span class="service-tag">ПРИГЛАШЕНИЕ</span>
+          </div>
+          <h3>Сайт-приглашение</h3>
+          <p>
+            Свадьба, день рождения или другой праздник: дата, место,
+            программа, дресс-код и анкета гостя — ответы приходят
+            в Google Таблицу.
+          </p>
+        </article>
+
+        <article class="service reveal reveal-delay-2">
+          <div class="service-top">
+            <span class="service-number">03</span>
+            <span class="service-tag">ДИЗАЙН</span>
+          </div>
+          <h3>Шаблон или свой</h3>
+          <p>
+            Готовый шаблон — быстрее: меняем тексты, цвета и фото.
+            Индивидуальный дизайн — под вашу задачу и настроение,
+            после брифа и выбора концепции.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 05 WORKS -->
+    <section class="works section dark-section" id="works">
+      <div class="section-head reveal">
+        <span class="section-number">05</span>
+        <span class="section-label">Работы</span>
+      </div>
+
+      <div class="works-intro reveal">
+        <h2>Работы.<br><em>По категориям.</em></h2>
+        <p>Нажмите на работу — сайт откроется в новой вкладке.</p>
+      </div>
+
+      <div class="works-bar reveal">
+        <div class="works-tabs" role="tablist" aria-label="Категории работ"></div>
+        <div class="works-controls">
+          <span class="works-counter" aria-live="polite">00 / 00</span>
+          <button class="works-arrow" type="button" data-dir="-1" aria-label="Предыдущие работы"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+          <button class="works-arrow" type="button" data-dir="1" aria-label="Следующие работы"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+
+      <div class="works-viewport reveal reveal-delay-1">
+        <ul class="works-track" id="works-track" role="tabpanel" aria-label="Работы"></ul>
+      </div>
+    </section>
+
+    <!-- 06 BRIEF -->
+    <section class="method section" id="method">
+      <div class="section-head reveal">
+        <span class="section-number">06</span>
+        <span class="section-label">Бриф</span>
+      </div>
+
+      <div class="method-heading reveal">
+        <p class="small-label">Перед началом работы</p>
+        <h2>Сначала бриф.<br>Потом — сайт.</h2>
+      </div>
+
+      <div class="method-grid">
+        <article class="method-card reveal">
+          <span>01</span>
+          <h3>Задача и аудитория</h3>
+          <p>Чем вы занимаетесь или что за событие, кто будет смотреть сайт, какой нужен тон: строгий, тёплый, торжественный или дерзкий.</p>
+        </article>
+
+        <article class="method-card reveal reveal-delay-1">
+          <span>02</span>
+          <h3>Стиль</h3>
+          <p>Палитра, шрифты, настроение, уровень — от простого до премиального. Референсы и что именно из них взять: цвет, структуру или атмосферу.</p>
+        </article>
+
+        <article class="method-card reveal reveal-delay-2">
+          <span>03</span>
+          <h3>Содержание</h3>
+          <p>Какие разделы нужны, тексты, фото и логотип, контакты и мессенджеры. Чего не хватает — отмечаем и уточняем, а не придумываем.</p>
+        </article>
+
+        <article class="method-card featured reveal reveal-delay-3">
+          <span>04</span>
+          <h3>Для приглашений</h3>
+          <p>Дата и место, программа дня, дресс-код, вопросы анкеты и срок ответа, список гостей для персональных обращений.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 07 PROCESS -->
+    <section class="process section dark-section" id="process">
+      <div class="section-head reveal">
+        <span class="section-number">07</span>
+        <span class="section-label">Этапы</span>
+      </div>
+
+      <div class="process-grid">
+        <div class="process-title reveal">
+          <h2>Простой<br><em>порядок.</em></h2>
+        </div>
+
+        <div class="steps">
+          <div class="step reveal">
+            <span class="step-index">01</span>
+            <div>
+              <h3>Бриф</h3>
+              <p>Обсуждаем задачу, стиль и содержание. Собираю всё в один понятный документ.</p>
+            </div>
+          </div>
+
+          <div class="step reveal reveal-delay-1">
+            <span class="step-index">02</span>
+            <div>
+              <h3>Концепция</h3>
+              <p>Предлагаю 2–3 варианта структуры и палитры с объяснением — вы выбираете.</p>
+            </div>
+          </div>
+
+          <div class="step reveal reveal-delay-2">
+            <span class="step-index">03</span>
+            <div>
+              <h3>Сборка и проверка</h3>
+              <p>Собираю сайт и проверяю его на телефоне, планшете и компьютере.</p>
+            </div>
+          </div>
+
+          <div class="step reveal reveal-delay-3">
+            <span class="step-index">04</span>
+            <div>
+              <h3>Правки и передача</h3>
+              <p>Вношу правки, публикую сайт или передаю готовые файлы с подсказкой, как их выложить.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 WHO -->
+    <section class="who section">
+      <div class="section-head reveal">
+        <span class="section-number">08</span>
+        <span class="section-label">Для кого</span>
+      </div>
+
+      <div class="who-content">
+        <h2 class="reveal">Если нужен<br><em>простой и красивый сайт — нам по пути.</em></h2>
+
+        <div class="who-list">
+          <div class="who-item reveal">
+            <span>01</span>
+            <p>Вы специалист или небольшой проект, и вам нужна аккуратная визитка: о себе, услугах и контактах.</p>
+          </div>
+          <div class="who-item reveal reveal-delay-1">
+            <span>02</span>
+            <p>Вы готовитесь к свадьбе и хотите приглашение, которое гости откроют по ссылке и сразу ответят.</p>
+          </div>
+          <div class="who-item reveal reveal-delay-2">
+            <span>03</span>
+            <p>Вы собираете гостей на день рождения, юбилей или другой праздник.</p>
+          </div>
+          <div class="who-item reveal reveal-delay-3">
+            <span>04</span>
+            <p>Вам нужна страница, которую можно выложить один раз и не обслуживать каждый день.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 CONTACT -->
+    <section class="contact section dark-section" id="contact">
+      <div class="contact-top reveal">
+        <span class="section-number">09</span>
+        <span class="section-label">Начать</span>
+      </div>
+
+      <div class="contact-main">
+        <p class="small-label reveal">Есть задача?</p>
+        <h2 class="contact-title reveal reveal-delay-1">
+          Напишите<br><em>мне.</em>
+        </h2>
+
+        <p class="contact-description reveal reveal-delay-2">
+          Коротко опишите, что нужно: визитка или приглашение,
+          к какой дате и в каком настроении. Отвечу и начнём с брифа.
+        </p>
+
+        <p class="contact-note reveal reveal-delay-2">
+          Стоимость и сроки зависят от задачи — обсудим в Telegram после короткого брифа.
+        </p>
+
+        <!-- ЗАМЕНИ ССЫЛКИ НИЖЕ НА СВОИ КОНТАКТЫ -->
+        <div class="contact-actions reveal reveal-delay-3">
+          <a class="big-button magnetic js-offer-gate" href="https://t.me/your_username" target="_blank" rel="noopener" data-channel="telegram">
+            <span>Написать в Telegram</span>
+            <span>↗</span>
+          </a>
+          <a class="outline-button js-offer-gate" href="mailto:your@email.com" data-channel="email">
+            your@email.com
+          </a>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <div>
+          <svg class="brand-mark" aria-hidden="true"><use href="#logo-mark"/></svg>
+          <span>Nikita · сайты</span>
+        </div>
+        <span>Визитки · приглашения</span>
+        <span class="footer-right">
+          <a href="offer/" target="_blank">Оферта</a>
+          <span>© <span id="year"></span></span>
+        </span>
+      </footer>
+    </section>
+  </main>
+
+  <!-- Живой просмотр работы -->
+  <div class="work-modal" id="work-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="wm-title">
+    <div class="wm-bar">
+      <div class="wm-title">
+        <span id="wm-category">Категория</span>
+        <h2 id="wm-title">Название работы</h2>
+      </div>
+      <div class="wm-devices" role="group" aria-label="Режим просмотра">
+        <button class="wm-device" type="button" data-device="phone" aria-pressed="true">Телефон</button>
+        <button class="wm-device" type="button" data-device="desktop" aria-pressed="false">Компьютер</button>
+      </div>
+      <div class="wm-actions">
+        <a class="wm-link" id="wm-link" href="#" target="_blank" rel="noopener" aria-label="Открыть в новой вкладке">
+          <span class="wm-link-text">Открыть</span><span aria-hidden="true">↗</span>
+        </a>
+        <button class="wm-close" type="button" data-close-work aria-label="Закрыть">×</button>
+      </div>
+    </div>
+    <div class="wm-stage" id="wm-stage">
+      <div class="wm-frame" id="wm-frame">
+        <div class="wm-chrome" aria-hidden="true"><i></i><i></i><i></i><span id="wm-url"></span></div>
+        <iframe id="wm-iframe" title="Просмотр работы" loading="lazy"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>
+        <div class="wm-loading">Загружаем сайт…</div>
+      </div>
+    </div>
+    <p class="wm-note">Если сайт не отобразился в окне — <a id="wm-note-link" href="#" target="_blank" rel="noopener">откройте его в новой вкладке</a>.</p>
+  </div>
+
+  <!-- Offer gate modal -->
+  <div class="offer-modal" id="offer-modal" aria-hidden="true" role="dialog" aria-labelledby="offer-modal-title">
+    <div class="offer-modal__backdrop" data-close-modal></div>
+    <div class="offer-modal__panel">
+      <p class="offer-modal__eyebrow">Перед обращением</p>
+      <h2 id="offer-modal-title" class="offer-modal__title">Ознакомьтесь с офертой</h2>
+      <p class="offer-modal__text">
+        В публичной оферте описаны условия работы, оплаты, сроков и ответственности.
+        Это помогает избежать недопонимания с обеих сторон.
+      </p>
+      <div class="offer-modal__actions">
+        <button type="button" class="offer-modal__btn offer-modal__btn--primary" id="offer-modal-accept">
+          Ознакомлен — продолжить
+        </button>
+        <a class="offer-modal__btn offer-modal__btn--outline" href="offer/" id="offer-modal-link">
+          Перейти к оферте
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script src="scripts/works.js"></script>
+  <script src="scripts/script.js"></script>
+</body>
+</html>

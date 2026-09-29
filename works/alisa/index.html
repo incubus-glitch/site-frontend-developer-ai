@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<title>Алиса — фотограф</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geologica:wght@200;300;400;600&family=Onest:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: три экрана-«плёнки» — тёмный, светлый, фиолетовый; 3D-узел за контентом
+     меняет материал ровно по границе секций. Одна фиксированная палитра по решению дизайна. */
+  :root{
+    --violet:#9E6CF8;
+    --paper:#F6F6F6;
+    --ink:#0D0A0E;
+    --violet-deep:color-mix(in srgb, var(--violet) 55%, var(--ink));
+    --violet-soft:color-mix(in srgb, var(--violet) 40%, var(--paper));
+
+    --f-display:'Geologica', 'Onest', system-ui, sans-serif;
+    --f-body:'Onest', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --f-mono:'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+    --gutter:clamp(20px, 5vw, 88px);
+    --ease:cubic-bezier(.16,.84,.44,1);
+    --chrome:var(--paper);
+    color-scheme:dark;
+  }
+  *,*::before,*::after{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0; background:var(--ink); color:var(--paper);
+    font-family:var(--f-body); font-size:16px; line-height:1.6;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  }
+  body[data-sec="1"], body[data-sec="2"]{ --chrome:var(--ink); }
+  h1,h2,p{ margin:0; }
+  ul{ list-style:none; margin:0; padding:0; }
+  a{ color:inherit; text-decoration:none; }
+  :focus-visible{ outline:2px solid var(--violet); outline-offset:4px; border-radius:4px; }
+
+  .mono{ font-family:var(--f-mono); font-size:.75rem; letter-spacing:.12em; text-transform:uppercase; }
+
+  /* ── Header ── */
+  .site-header{
+    position:fixed; top:0; left:0; right:0; z-index:30;
+    padding:calc(18px + env(safe-area-inset-top, 0px)) var(--gutter) 18px;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    color:var(--chrome); transition:color .5s var(--ease);
+  }
+  .logo{ font-family:var(--f-display); font-weight:400; font-size:1.25rem; letter-spacing:-.02em; display:flex; align-items:baseline; gap:10px; }
+  .logo .mono{ font-size:.65rem; opacity:.6; }
+  .nav{ display:flex; gap:clamp(14px, 3vw, 36px); }
+  .nav a{ position:relative; padding-block:6px; }
+  .nav a::after{ content:""; position:absolute; left:0; right:100%; bottom:0; height:1px; background:currentColor; transition:right .35s var(--ease); }
+  .nav a:hover::after{ right:0; }
+
+  .dots{
+    position:fixed; right:calc(var(--gutter) * .45); top:50%; transform:translateY(-50%);
+    z-index:30; display:flex; flex-direction:column; gap:14px;
+  }
+  .dots button{
+    width:10px; height:10px; padding:0; border-radius:50%; cursor:pointer;
+    border:1px solid var(--chrome); background:transparent;
+    transition:background .3s var(--ease), transform .3s var(--ease), border-color .5s var(--ease);
+  }
+  .dots button[aria-current="true"]{ background:var(--chrome); transform:scale(1.25); }
+
+  /* ── Сцена: фон секции < слой узла < контент ──
+     У каждого блока свой слой: окно .knot-clip обрезано по краям блока (clip-path + clip),
+     а холст внутри зафиксирован на экране. Обрезку делает сам браузер при скролле,
+     поэтому шов материала всегда совпадает с границей блока пиксель в пиксель. */
+  .screen{ position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; justify-content:center; padding:96px var(--gutter) 72px; }
+  .screen > *{ position:relative; z-index:2; }
+  .screen > .knot-clip{
+    position:absolute; inset:0; z-index:1; pointer-events:none;
+    clip-path:inset(0); clip:rect(auto, auto, auto, auto);
+  }
+  .knot-clip canvas{
+    position:fixed; top:0; left:0; width:100%; height:100vh; height:100lvh; display:block;
+  }
+  .s-about{ background:var(--ink); color:var(--paper); }
+  .s-gallery{ background:var(--paper); color:var(--ink); }
+  .s-contact{ background:var(--violet); color:var(--ink); }
+
+  /* ── Обо мне ── */
+  .about{ max-width:560px; display:flex; flex-direction:column; gap:22px; }
+  .about .mono{ color:var(--violet); }
+  .about h1{
+    font-family:var(--f-display); font-weight:200; line-height:.86;
+    font-size:clamp(4.5rem, 15vw, 11.5rem); letter-spacing:-.055em; margin-left:-.05em;
+  }
+  .about h1 em{ font-style:normal; color:var(--violet); }
+  .about p{ color:color-mix(in srgb, var(--paper) 78%, var(--ink)); max-width:48ch; }
+  .tags{ display:flex; flex-wrap:wrap; gap:8px; }
+  .tags li{ border:1px solid color-mix(in srgb, var(--paper) 22%, var(--ink)); border-radius:999px; padding:6px 14px; font-family:var(--f-mono); font-size:.72rem; letter-spacing:.06em; }
+  .scroll-hint{ position:absolute; left:var(--gutter); bottom:28px; z-index:2; color:color-mix(in srgb, var(--paper) 55%, var(--ink)); transition:opacity .4s var(--ease); }
+
+  .intro > *{ animation:rise 1s var(--ease) both; }
+  .intro > *:nth-child(2){ animation-delay:.08s; }
+  .intro > *:nth-child(3){ animation-delay:.16s; }
+  .intro > *:nth-child(4){ animation-delay:.24s; }
+  .intro > *:nth-child(5){ animation-delay:.32s; }
+  @keyframes rise{ from{ opacity:.001; transform:translateY(22px); } to{ opacity:1; transform:none; } }
+
+  /* ── Галерея / карусель (coverflow) ── */
+  .gallery-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:clamp(56px, 10vh, 104px); }
+  .gallery-head .mono{ color:var(--violet-deep); margin-bottom:10px; }
+  .gallery-head h2{ font-family:var(--f-display); font-weight:300; font-size:clamp(2.2rem, 5vw, 4rem); letter-spacing:-.04em; line-height:1; text-wrap:balance; }
+  .counter{ font-family:var(--f-mono); font-size:.85rem; font-variant-numeric:tabular-nums; }
+  .counter b{ font-weight:500; color:var(--violet-deep); }
+
+  /* кадры на всю ширину сверху, под ними строка управления: ‹ подпись › */
+  .carousel{
+    --slide-w:200px; outline-offset:8px;
+    display:grid; grid-template-columns:auto minmax(0, 1fr) auto; align-items:center;
+    grid-template-areas:"view view view" "prev cap next"; row-gap:22px; column-gap:16px;
+    width:min(100%, calc(var(--slide-w) * 2.7)); margin-inline:auto;
+  }
+  .carousel-viewport{ grid-area:view; justify-self:center; }
+  .carousel-btn.prev{ grid-area:prev; }
+  .carousel-btn.next{ grid-area:next; }
+  .exif{ grid-area:cap; }
+  /* матовая подложка за каруселью: мягкий овал, который размывает узел позади кадров
+     и растворяется к краям без видимой границы */
+  .carousel::before{
+    content:""; position:absolute; left:50%; top:calc(var(--slide-w) * 2 / 3 + 12px); z-index:-1; pointer-events:none;
+    width:min(calc(var(--slide-w) * 3.4), 140vw); height:calc(var(--slide-w) * 2.3);
+    transform:translate(-50%, -50%);
+    background:color-mix(in srgb, var(--paper) 68%, transparent);
+    -webkit-backdrop-filter:blur(40px) saturate(1.1);
+    backdrop-filter:blur(40px) saturate(1.1);
+    -webkit-mask-image:radial-gradient(closest-side, #000 38%, rgba(0,0,0,.6) 66%, transparent 100%);
+    mask-image:radial-gradient(closest-side, #000 38%, rgba(0,0,0,.6) 66%, transparent 100%);
+  }
+  .carousel-viewport{
+    position:relative; overflow:visible; flex:0 1 auto;
+    width:100%; max-width:100%;
+    height:calc(var(--slide-w) * 4 / 3 + 24px);
+    touch-action:pan-y; cursor:grab; user-select:none;
+  }
+  .carousel-viewport:active{ cursor:grabbing; }
+  .carousel-track{ position:relative; width:100%; height:100%; }
+  .carousel-slide{
+    position:absolute; top:50%; left:50%; width:var(--slide-w); aspect-ratio:3/4; max-width:100%;
+    transition:transform .6s var(--ease), opacity .6s var(--ease), filter .6s var(--ease);
+  }
+  .carousel-slide:not(.is-active){ filter:saturate(.7); }
+  .ph{
+    position:relative; margin:0; width:100%; height:100%; border-radius:18px; overflow:hidden;
+    display:flex; flex-direction:column; justify-content:space-between; padding:16px;
+    color:var(--paper); box-shadow:0 24px 50px -24px color-mix(in srgb, var(--ink) 55%, transparent);
+  }
+  .ph::before{ content:""; position:absolute; inset:12px; border:1px solid color-mix(in srgb, var(--paper) 28%, transparent); border-radius:10px; pointer-events:none; }
+  .ph::after{
+    content:""; position:absolute; left:50%; top:50%; width:34%; aspect-ratio:1; transform:translate(-50%,-50%);
+    border-radius:50%; border:1px solid color-mix(in srgb, var(--paper) 45%, transparent);
+    background:radial-gradient(circle, color-mix(in srgb, var(--paper) 40%, transparent) 0 6%, transparent 7%);
+  }
+  .ph span{ position:relative; z-index:1; font-family:var(--f-mono); font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; opacity:.85; }
+  .ph span:last-child{ align-self:flex-end; }
+  .ph-1{ background:linear-gradient(165deg, var(--violet) 0%, var(--ink) 100%); }
+  .ph-2{ background:radial-gradient(120% 90% at 25% 15%, var(--paper) 0%, var(--violet-soft) 30%, var(--violet) 60%, var(--ink) 100%); }
+  .ph-3{ background:linear-gradient(200deg, var(--ink) 10%, var(--violet-deep) 70%, var(--violet) 100%); }
+  .ph-4{ background:radial-gradient(90% 70% at 70% 80%, var(--violet) 0%, var(--violet-deep) 45%, var(--ink) 100%); }
+  .ph-5{ background:linear-gradient(140deg, var(--violet-soft) 0%, var(--violet) 55%, var(--violet-deep) 100%); }
+  .ph-6{ background:radial-gradient(100% 80% at 50% 0%, var(--violet-deep) 0%, var(--ink) 75%); }
+  .ph-7{ background:linear-gradient(180deg, var(--paper) 0%, var(--violet-soft) 40%, var(--violet-deep) 100%); color:var(--ink); }
+  .ph-7::before, .ph-7::after{ border-color:color-mix(in srgb, var(--ink) 30%, transparent); }
+  .ph-8{ background:conic-gradient(from 210deg at 60% 40%, var(--ink), var(--violet), var(--violet-soft), var(--violet-deep), var(--ink)); }
+  .ph-9{ background:linear-gradient(120deg, var(--ink) 0%, var(--violet) 100%); }
+
+  .carousel-btn{
+    flex:0 0 auto; width:48px; height:48px; border-radius:50%; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center;
+    border:1px solid color-mix(in srgb, var(--ink) 30%, var(--paper)); background:color-mix(in srgb, var(--paper) 70%, transparent);
+    color:var(--ink); transition:background .3s var(--ease), color .3s var(--ease), border-color .3s var(--ease);
+  }
+  .carousel-btn:hover, .carousel-btn:focus-visible{ background:var(--violet); border-color:var(--violet); color:var(--paper); }
+  .carousel-btn svg{ width:18px; height:18px; }
+  /* подпись кадра: плашка поверх размытия, тёмный текст — читается на любом фоне */
+  .exif{
+    margin:0; justify-self:center; text-align:center; min-height:1.6em;
+    padding:8px 16px; border-radius:999px;
+    background:var(--paper); border:1px solid color-mix(in srgb, var(--ink) 12%, var(--paper));
+    box-shadow:0 6px 20px -10px color-mix(in srgb, var(--ink) 35%, transparent);
+    font-family:var(--f-mono); font-size:.85rem; font-weight:500; letter-spacing:.03em;
+    color:var(--ink); font-variant-numeric:tabular-nums;
+  }
+
+  /* ── Контакты ── */
+  .contact{ max-width:620px; display:flex; flex-direction:column; gap:22px; }
+  .contact h2{ font-family:var(--f-display); font-weight:200; font-size:clamp(3rem, 9vw, 7rem); line-height:.9; letter-spacing:-.05em; text-wrap:balance; }
+  .contact p{ max-width:40ch; font-size:1.05rem; }
+  .messengers{ display:flex; flex-wrap:wrap; gap:12px; margin-top:8px; }
+  .msg-btn{
+    display:inline-flex; align-items:center; gap:14px; min-height:64px; padding:12px 26px 12px 14px;
+    border-radius:999px; border:1.5px solid var(--ink); font-weight:600; font-size:1.05rem;
+    transition:transform .35s var(--ease), background .35s var(--ease), color .35s var(--ease);
+  }
+  .msg-btn .ico{ width:40px; height:40px; border-radius:50%; display:grid; place-items:center; font-family:var(--f-mono); font-size:.8rem; font-weight:500; }
+  .msg-btn small{ display:block; font-family:var(--f-mono); font-weight:400; font-size:.7rem; letter-spacing:.04em; opacity:.7; }
+  .msg-tg{ background:var(--ink); color:var(--paper); }
+  .msg-tg .ico{ background:var(--violet); color:var(--ink); }
+  .msg-vk{ color:var(--ink); }
+  .msg-vk .ico{ background:var(--ink); color:var(--violet); }
+  .msg-btn:hover{ transform:translateY(-3px); }
+  .msg-vk:hover{ background:var(--paper); }
+  .msg-tg:hover{ background:var(--violet-deep); }
+  .foot{ position:absolute; left:var(--gutter); right:var(--gutter); bottom:24px; z-index:2; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; opacity:.75; }
+
+  /* ── Breakpoints ── */
+  @media (max-width: 767px){
+    .dots{ display:none; }
+    .nav{ gap:14px; font-size:.62rem; }
+    .s-about, .s-contact{ justify-content:flex-end; padding-bottom:88px; }
+    .scroll-hint{ display:none; }
+    .carousel-btn{ width:40px; height:40px; }
+    .exif{ font-size:.7rem; padding:7px 12px; letter-spacing:0; border-radius:14px; }
+  }
+  @media (min-width: 768px){ .carousel{ --slide-w:250px; } }
+  @media (min-width: 1100px){ .carousel{ --slide-w:280px; } }
+  @media (min-width: 1440px){ .carousel{ --slide-w:310px; } }
+  @media (max-height: 640px) and (min-width: 768px){ .carousel{ --slide-w:220px; } }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    .intro > *{ animation:none; }
+    .carousel-slide{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="logo" href="#about">Алиса <span class="mono">фото</span></a>
+  <nav class="nav mono" aria-label="Разделы">
+    <a href="#about">Обо мне</a>
+    <a href="#gallery">Галерея</a>
+    <a href="#contact">Контакты</a>
+  </nav>
+</header>
+
+<div class="dots" id="dots" aria-label="Навигация по экранам">
+  <button type="button" aria-label="Обо мне" aria-current="true"></button>
+  <button type="button" aria-label="Галерея"></button>
+  <button type="button" aria-label="Контакты"></button>
+</div>
+
+<main>
+  <section class="screen s-about" id="about" data-i="0">
+    <div class="knot-clip" aria-hidden="true"><canvas></canvas></div>
+    <div class="about intro">
+      <span class="mono">Фотограф · Обо мне</span>
+      <h1>Али<em>с</em>а</h1>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.</p>
+      <ul class="tags">
+        <li>Портрет</li><li>Love story</li><li>Репортаж</li><li>Семейная съёмка</li>
+      </ul>
+    </div>
+    <span class="scroll-hint mono" id="scrollHint">Листайте вниз ↓</span>
+  </section>
+
+  <section class="screen s-gallery" id="gallery" data-i="1">
+    <div class="knot-clip" aria-hidden="true"><canvas></canvas></div>
+    <div class="gallery-head">
+      <div>
+        <p class="mono">Галерея</p>
+        <h2>Избранные кадры</h2>
+      </div>
+      <p class="counter" aria-live="polite"><b id="curNum">01</b> / <span id="totalNum">09</span></p>
+    </div>
+
+    <div class="carousel" id="galleryCarousel" role="group" aria-roledescription="карусель" aria-label="Галерея — листайте стрелками, свайпом или клавишами" tabindex="0">
+      <button class="carousel-btn prev" type="button" aria-label="Предыдущий кадр">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="carousel-viewport">
+        <ul class="carousel-track" id="carouselTrack">
+          <li class="carousel-slide" data-exif="Портрет · 85 мм · f/1.8 · 1/250 · ISO 200"><figure class="ph ph-1"><span>Кадр 01</span><span>Заглушка · 3:4</span></figure></li>
+          <li class="carousel-slide" data-exif="Love story · 50 мм · f/2 · 1/500 · ISO 100"><figure class="ph ph-2"><span>Кадр 02</span><span>Заглушка · 3:4</span></figure></li>
+          <li class="carousel-slide" data-exif="Репортаж · 35 мм · f/2.8 · 1/160 · ISO 800"><figure class="ph ph-3"><span>Кадр 03</span><span>Заглушка · 3:4</span></figure></li>
+          <li class="carousel-slide" data-exif="Портрет · 105 мм · f/2.4 · 1/320 · ISO 160"><figure class="ph ph-4"><span>Кадр 04</span><span>Заглушка · 3:4</span></figure></li>
+          <li class="carousel-slide" data-exif="Семейная · 50 мм · f/2.2 · 1/400 · ISO 200"><figure class="ph ph-5"><span>Кадр 05</span><span>Заглушка · 3:4</span></figure></li>
+          <li class="carousel-slide" data-exif="Портрет · 85 мм · f/1.4 · 1/125 · ISO 640"><figure class="ph ph-6"><span>Кадр 06</span><span>Заглушка · 3:4</span></figure></li>
+          <li class="carousel-slide" data-exif="Love story · 35 мм · f/4 · 1/800 · ISO 100"><figure class="ph ph-7"><span>Кадр 07</span><span>Заглушка · 3:4</span></figure></li>
+          <li class="carousel-slide" data-exif="Репортаж · 24 мм · f/2.8 · 1/200 · ISO 1600"><figure class="ph ph-8"><span>Кадр 08</span><span>Заглушка · 3:4</span></figure></li>
+          <li class="carousel-slide" data-exif="Портрет · 85 мм · f/2 · 1/250 · ISO 320"><figure class="ph ph-9"><span>Кадр 09</span><span>Заглушка · 3:4</span></figure></li>
+        </ul>
+      </div>
+      <p class="exif" id="exif" aria-live="polite"></p>
+      <button class="carousel-btn next" type="button" aria-label="Следующий кадр">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <section class="screen s-contact" id="contact" data-i="2">
+    <div class="knot-clip" aria-hidden="true"><canvas></canvas></div>
+    <div class="contact">
+      <span class="mono">Контакты</span>
+      <h2>Напишите мне</h2>
+      <p>Расскажите, какую съёмку вы задумали: дату, место и настроение. Отвечаю в мессенджерах.</p>
+      <div class="messengers">
+        <a class="msg-btn msg-tg" href="https://t.me/username" target="_blank" rel="noopener">
+          <span class="ico" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M21 4L3 11l6 2.5L11.5 20 15 15.5l5 3.5L21 4z"/><path d="M9 13.5L21 4"/></svg>
+          </span>
+          <span>Telegram<small>@username</small></span>
+        </a>
+        <a class="msg-btn msg-vk" href="https://vk.com/username" target="_blank" rel="noopener">
+          <span class="ico" aria-hidden="true">VK</span>
+          <span>ВКонтакте<small>vk.com/username</small></span>
+        </a>
+      </div>
+    </div>
+    <div class="foot mono"><span>© 2026 Алиса</span><span>Фотограф</span></div>
+  </section>
+</main>
+
+<script>
+  // ── Активный экран: цвет хедера/точек, подсказка скролла ──
+  (function(){
+    var sections = Array.prototype.slice.call(document.querySelectorAll('.screen'));
+    var dots = Array.prototype.slice.call(document.querySelectorAll('#dots button'));
+    var hint = document.getElementById('scrollHint');
+    var prev = -1;
+    dots.forEach(function(d, i){
+      d.addEventListener('click', function(){ sections[i].scrollIntoView({ behavior:'smooth' }); });
+    });
+    function update(){
+      var mid = 40; // линия под хедером
+      var active = 0;
+      sections.forEach(function(s, i){ if(s.getBoundingClientRect().top <= mid) active = i; });
+      if(active !== prev){
+        prev = active;
+        document.body.setAttribute('data-sec', String(active));
+        dots.forEach(function(d, i){ d.setAttribute('aria-current', i === active ? 'true' : 'false'); });
+      }
+      if(hint) hint.style.opacity = window.scrollY > innerHeight * 0.2 ? '0' : '';
+    }
+    update();
+    addEventListener('scroll', update, { passive:true });
+    addEventListener('resize', update);
+  })();
+
+  // ── Карусель: активный кадр по центру, соседние — по бокам уменьшенными ──
+  (function(){
+    var carousel = document.getElementById('galleryCarousel');
+    var viewport = carousel.querySelector('.carousel-viewport');
+    var slides = Array.prototype.slice.call(document.getElementById('carouselTrack').children);
+    var total = slides.length;
+    var exif = document.getElementById('exif');
+    var curNum = document.getElementById('curNum');
+    document.getElementById('totalNum').textContent = String(total).padStart(2, '0');
+    var current = 0;
+
+    function render(){
+      slides.forEach(function(slide, i){
+        var raw = (i - current + total) % total;
+        if(raw > total / 2) raw -= total;
+        var abs = Math.abs(raw), sign = Math.sign(raw);
+        var tx, scale, opacity, z, rot;
+        if(raw === 0){ tx = 0; scale = 1; opacity = 1; z = 5; rot = 0; }
+        else if(abs === 1){ tx = sign * 72; scale = .8; opacity = .75; z = 4; rot = sign * 4; }
+        else if(abs === 2){ tx = sign * 122; scale = .62; opacity = innerWidth < 768 ? 0 : .28; z = 2; rot = sign * 7; }
+        else { tx = sign * 170; scale = .5; opacity = 0; z = 1; rot = sign * 9; }
+        slide.style.transform = 'translate(-50%, -50%) translateX(' + tx + '%) scale(' + scale + ') rotate(' + rot + 'deg)';
+        slide.style.opacity = String(opacity);
+        slide.style.zIndex = String(z);
+        slide.style.pointerEvents = abs <= 1 ? 'auto' : 'none';
+        slide.classList.toggle('is-active', raw === 0);
+        slide.setAttribute('aria-hidden', raw === 0 ? 'false' : 'true');
+      });
+      curNum.textContent = String(current + 1).padStart(2, '0');
+      exif.textContent = slides[current].getAttribute('data-exif');
+    }
+    function goTo(i){ current = ((i % total) + total) % total; render(); }
+    function next(){ goTo(current + 1); }
+    function prev(){ goTo(current - 1); }
+
+    carousel.querySelector('.prev').addEventListener('click', prev);
+    carousel.querySelector('.next').addEventListener('click', next);
+    carousel.addEventListener('keydown', function(e){
+      if(e.key === 'ArrowLeft'){ e.preventDefault(); prev(); }
+      else if(e.key === 'ArrowRight'){ e.preventDefault(); next(); }
+    });
+    // клик по боковому кадру — перейти к нему
+    slides.forEach(function(slide, i){
+      slide.addEventListener('click', function(){ if(!dragMoved && i !== current) goTo(i); });
+    });
+
+    var dragging = false, startX = 0, startY = 0, horizontal = false, dragMoved = false;
+    viewport.addEventListener('pointerdown', function(e){
+      dragging = true; horizontal = false; dragMoved = false; startX = e.clientX; startY = e.clientY;
+    });
+    viewport.addEventListener('pointermove', function(e){
+      if(!dragging) return;
+      var dx = e.clientX - startX, dy = e.clientY - startY;
+      if(!horizontal && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) horizontal = true;
+      if(horizontal && e.cancelable) e.preventDefault();
+    }, { passive:false });
+    function endDrag(e){
+      if(!dragging) return;
+      dragging = false;
+      if(!horizontal) return;
+      var dx = e.clientX - startX;
+      if(Math.abs(dx) > 40){ dragMoved = true; dx < 0 ? next() : prev(); setTimeout(function(){ dragMoved = false; }, 0); }
+    }
+    viewport.addEventListener('pointerup', endDrag);
+    viewport.addEventListener('pointerleave', endDrag);
+    viewport.addEventListener('pointercancel', function(){ dragging = false; });
+
+    render();
+  })();
+</script>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.webgpu.js",
+    "three/webgpu": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.webgpu.js",
+    "three/tsl": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.tsl.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+  import * as THREE from 'three/webgpu'
+  import {
+    color, positionWorld, positionLocal, normalLocal, tangentLocal, bitangentLocal,
+    modelNormalMatrix, time, Fn, sin, cos, mix, uv, mx_fractal_noise_float, uniform, float, vec2,
+  } from 'three/tsl'
+  import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
+
+  const sections = Array.from(document.querySelectorAll('.screen'))
+  const canvases = sections.map((s) => s.querySelector('.knot-clip canvas'))
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
+  const params = { interactionMultiplier: 0.22, lerpSpeed: 4, poseSpeed: 6, fov: 30, cameraZ: 7.5 }
+
+  const VIOLET = new THREE.Color(0x9e6cf8)
+  const PAPER = new THREE.Color(0xf6f6f6)
+  const INK = new THREE.Color(0x0d0a0e)
+
+  // ─── Спиральное смещение + аналитическая нормаль (как в исходнике) ───
+  function applySpiral(material) {
+    const uFreq = uniform(6), uTwist = uniform(4), uAmp = uniform(0.025), uSpeed = uniform(reduceMotion ? 0 : -0.6)
+    const TAU = float(Math.PI * 2)
+    material.positionNode = Fn(() => {
+      const u = uv().x.mul(TAU), v = uv().y.mul(TAU)
+      const wave = sin(u.mul(uFreq).add(v.mul(uTwist)).sub(time.mul(uSpeed)))
+      return positionLocal.add(normalLocal.mul(wave.mul(uAmp)))
+    })()
+    material.normalNode = Fn(() => {
+      const u = uv().x.mul(TAU), v = uv().y.mul(TAU)
+      const grad = cos(u.mul(uFreq).add(v.mul(uTwist)).sub(time.mul(uSpeed))).mul(uAmp)
+      const n = normalLocal
+        .sub(tangentLocal.mul(grad.mul(uFreq).mul(TAU)))
+        .sub(bitangentLocal.mul(grad.mul(uTwist).mul(TAU)))
+        .normalize()
+      return modelNormalMatrix.mul(n).normalize()
+    })()
+    return material
+  }
+
+  // ─── Материал для каждого блока ───
+  const materialFactories = [
+    // «Обо мне», тёмный фон: фиолетовый сатин-металл
+    () => {
+      const a = uniform(color(VIOLET.clone().lerp(INK, 0.35)))
+      const b = uniform(color(VIOLET.clone().lerp(PAPER, 0.35)))
+      const m = new THREE.MeshPhysicalNodeMaterial()
+      m.colorNode = Fn(() => {
+        const w = sin(positionWorld.x.mul(3.2).add(positionWorld.y.mul(1.4)).add(time.mul(0.4))).mul(0.5).add(0.5)
+        return mix(a, b, w)
+      })()
+      m.roughness = 0.28; m.metalness = 0.8
+      m.specularIntensity = 1.5; m.specularColor.copy(PAPER)
+      return m
+    },
+    // «Галерея», светлый фон: чёрный лак с фиолетовым отливом
+    () => {
+      const a = uniform(color(INK))
+      const b = uniform(color(INK.clone().lerp(VIOLET, 0.22)))
+      const m = new THREE.MeshPhysicalNodeMaterial()
+      m.colorNode = Fn(() => {
+        const w = sin(positionWorld.y.mul(4).add(time.mul(0.5))).mul(0.5).add(0.5)
+        return mix(a, b, w)
+      })()
+      m.roughness = 0.24; m.metalness = 0; m.envMapIntensity = 0.45
+      m.specularIntensity = 0.8; m.specularColor.copy(VIOLET.clone().lerp(PAPER, 0.4))
+      return m
+    },
+    // «Контакты», фиолетовый фон: светлая керамика с FBM-дымкой
+    () => {
+      const a = uniform(color(PAPER))
+      const b = uniform(color(PAPER.clone().lerp(VIOLET, 0.25)))
+      const m = new THREE.MeshPhysicalNodeMaterial()
+      m.colorNode = Fn(() => {
+        const w = sin(positionWorld.x.mul(1.8).add(positionWorld.y.mul(2.4)).add(time.mul(0.35))).mul(0.5).add(0.5)
+        return mix(a, b, w)
+      })()
+      const hazeUv = uv().sub(vec2(float(0), time.mul(reduceMotion ? 0 : -0.02)))
+      const fbm = mx_fractal_noise_float(hazeUv.mul(14), 3, 3.2, 0.6).mul(0.5).add(0.5)
+      m.roughnessNode = fbm.mul(0.55).add(0.08)
+      m.metalness = 0; m.clearcoat = 0.5; m.clearcoatRoughness = 0.2
+      return m
+    },
+  ]
+
+  // ─── Один рендерер на всю страницу ───
+  // Рисует во внутренний холст, а готовый кадр копируется в холст нужного блока.
+  // Холсты блоков обрезаются браузером по краям секций, поэтому шов материала
+  // всегда совпадает с границей блока. Используется WebGL — он работает в любом браузере.
+  const posesDesktop = [ { x: 1.65, y: 0, s: 0.68 }, { x: 0, y: 0.05, s: 0.85 }, { x: 1.65, y: 0.05, s: 0.66 } ]
+  const posesMobile = [ { x: 0.2, y: 1.3, s: 0.32 }, { x: 0, y: 0.1, s: 0.45 }, { x: 0.2, y: 1.3, s: 0.32 } ]
+  const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
+  const clamp01 = (t) => Math.min(1, Math.max(0, t))
+
+  try {
+    const renderer = new THREE.WebGPURenderer({ antialias: true, alpha: true, forceWebGL: true })
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75))
+    renderer.toneMapping = THREE.AgXToneMapping
+    renderer.setClearColor(0x000000, 0)
+    await renderer.init()
+    const src = renderer.domElement
+
+    const scene = new THREE.Scene()
+    const camera = new THREE.PerspectiveCamera(params.fov, 1, 1, 2000)
+    camera.position.set(0, 0, params.cameraZ)
+
+    const geometry = new THREE.TorusKnotGeometry(1, 0.38, 220, 64, 2, 3)
+    geometry.computeTangents()
+    const pivot = new THREE.Group()
+    scene.add(pivot)
+    const meshes = materialFactories.map((make) => {
+      const mesh = new THREE.Mesh(geometry, applySpiral(make()))
+      pivot.add(mesh)
+      return mesh
+    })
+
+    const pmrem = new THREE.PMREMGenerator(renderer)
+    scene.environment = pmrem.fromScene(new RoomEnvironment()).texture
+
+    const key = new THREE.SpotLight(0xffffff, 8, 30, Math.PI / 4, 0.5, 1); key.position.set(4, 3, 5)
+    const fill = new THREE.SpotLight(VIOLET.clone().lerp(PAPER, 0.5), 4, 30, Math.PI / 3, 0.7, 1); fill.position.set(-5, 1, 3)
+    const rim = new THREE.SpotLight(0xffffff, 6, 30, Math.PI / 4, 0.4, 1); rim.position.set(0, 4, -5)
+    scene.add(key, fill, rim)
+
+    const ctxs = canvases.map((c) => c.getContext('2d'))
+
+    let W = 0, H = 0
+    function resize() {
+      W = innerWidth
+      H = canvases[0].clientHeight || innerHeight
+      camera.aspect = W / H
+      camera.updateProjectionMatrix()
+      renderer.setSize(W, H, false)
+      for (const c of canvases) { c.width = src.width; c.height = src.height }
+    }
+    resize()
+
+    meshes.forEach((m) => (m.visible = true))
+    await renderer.compileAsync(scene, camera)
+    meshes.forEach((m) => (m.visible = false))
+
+    const mouse = new THREE.Vector2()
+    const rot = new THREE.Vector2()
+    addEventListener('pointermove', (e) => {
+      mouse.x = (e.clientX / innerWidth) * 2 - 1
+      mouse.y = -(e.clientY / innerHeight) * 2 + 1
+    })
+
+    const pose = { x: 0, y: 0, s: 0 }
+    let poseInit = false
+    let intro = reduceMotion ? 1 : 0
+    let idle = 0
+    let last = performance.now()
+
+    function frame() {
+      requestAnimationFrame(frame)
+      const now = performance.now()
+      const delta = Math.min(Math.max((now - last) / 1000, 0), 0.1)
+      last = now
+      if (!reduceMotion) idle += delta * 0.07
+      intro = Math.min(1, intro + delta * 0.8)
+
+      const a = 1 - Math.exp(-params.lerpSpeed * delta)
+      rot.x += (-mouse.y * params.interactionMultiplier - rot.x) * a
+      rot.y += (mouse.x * params.interactionMultiplier - rot.y) * a
+
+      const vh = innerHeight
+      const rects = sections.map((s) => s.getBoundingClientRect())
+
+      // Узел переезжает, пока новый блок заходит в нижнюю часть экрана
+      const poses = innerWidth < 768 ? posesMobile : posesDesktop
+      let f = 0
+      for (let i = 1; i < rects.length; i++) f += clamp01((vh - rects[i].top) / (vh * 0.6))
+      const i0 = Math.min(Math.floor(f), poses.length - 1)
+      const i1 = Math.min(i0 + 1, poses.length - 1)
+      const t = ease(f - i0)
+      const tx = poses[i0].x + (poses[i1].x - poses[i0].x) * t
+      const ty = poses[i0].y + (poses[i1].y - poses[i0].y) * t
+      const ts = poses[i0].s + (poses[i1].s - poses[i0].s) * t
+      if (!poseInit || !Number.isFinite(pose.x + pose.y + pose.s)) { pose.x = tx; pose.y = ty; pose.s = ts; poseInit = true }
+      const pa = reduceMotion ? 1 : 1 - Math.exp(-params.poseSpeed * delta)
+      pose.x += (tx - pose.x) * pa
+      pose.y += (ty - pose.y) * pa
+      pose.s += (ts - pose.s) * pa
+
+      pivot.position.set(pose.x, pose.y, 0)
+      pivot.scale.setScalar(pose.s * (0.85 + 0.15 * ease(intro)))
+      pivot.rotation.set(rot.x, rot.y + idle * 0.6, idle)
+
+      rects.forEach((r, i) => {
+        if (r.bottom <= 0 || r.top >= vh) return // блок вне экрана — не рисуем
+        for (const m of meshes) m.visible = false
+        meshes[i].visible = true
+        renderer.render(scene, camera)
+        // копируем кадр сразу, в том же такте, пока буфер WebGL не очищен
+        const ctx = ctxs[i]
+        ctx.clearRect(0, 0, src.width, src.height)
+        ctx.drawImage(src, 0, 0)
+      })
+    }
+    requestAnimationFrame(frame)
+    document.body.classList.add('knot-ready')
+
+    let resizeRaf = 0
+    addEventListener('resize', () => {
+      cancelAnimationFrame(resizeRaf)
+      resizeRaf = requestAnimationFrame(resize)
+    })
+  } catch (err) {
+    // без WebGL сайт остаётся полностью рабочим, просто без 3D
+    document.querySelectorAll('.knot-clip').forEach((el) => el.remove())
+    console.warn('3D отключён:', err)
+  }
+</script>
+
+</body>
+</html>
